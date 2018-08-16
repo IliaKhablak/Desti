@@ -6,12 +6,15 @@ const config = require('./config/database');
 const path = require('path');
 const authentication = require('./routes/authentication')(router);
 const bodyParser = require('body-parser');
+const cors = require('cors');
 mongoose.Promise = global.Promise;
 mongoose.connect(config.uri, (err)=>{
     if(err){console.log('can not connect to db: ', err)}
     else{console.log('Connected to db: ' + config.db)}
 });
-
+app.use(cors({
+    origin:'*'
+}))
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/client/dist/client'));

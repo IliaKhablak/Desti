@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validator, Validators} from '@angular/forms';
 import {trigger, animate, transition, style} from '@angular/animations';
-
+import {AuthService} from '../services/auth.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -25,9 +26,20 @@ import {trigger, animate, transition, style} from '@angular/animations';
 export class RegisterComponent implements OnInit {
 
   form: FormGroup;
+  message:string;
+  classMes:string;
+  processing:boolean = false;
+  showPassword:boolean = true;
+  showPassword2:string = 'password';
+  emailValid;
+  emailMessage;
+  usernameValid;
+  usernameMessage;
 
   constructor(
-    private formBuilder:FormBuilder
+    private formBuilder:FormBuilder,
+    private auth:AuthService,
+    private router:Router
   ) {
     this.createForm();
   }
@@ -90,8 +102,77 @@ export class RegisterComponent implements OnInit {
     },{validator:this.matchingPassword('password','confirm')})
   }
 
+  showPas(){
+    this.showPassword = !this.showPassword;
+    if(this.showPassword){this.showPassword2 = 'password'}
+    else{this.showPassword2 = 'text'}
+  }
+
+  disableForm(){
+    this.form.controls['email'].disable();
+    this.form.controls['username'].disable();
+    this.form.controls['password'].disable();
+    this.form.controls['confirm'].disable();
+  }
+
+  enableForm(){
+    this.form.controls['email'].enable();
+    this.form.controls['username'].enable();
+    this.form.controls['password'].enable();
+    this.form.controls['confirm'].enable();
+  }
+
   onRegisterSubmit(){
-    console.log(this.form);
+    this.processing = true;
+    this.disableForm();
+    this.emailMessage = null;
+    this.usernameMessage = null;
+    const user = {
+      email: this.form.get('email').value,
+      username: this.form.get('username').value,
+      password: this.form.get('password').value
+    }
+
+    this.auth.registerUser(user).subscribe(res=>{
+      // console.log(res['success']);
+      // console.log(res['message']);
+      if(res['success']){
+        this.message = res['message'];
+        this.classMes = 'alert-success';
+        setTimeout(()=>{
+          this.router.navigate(['/'])
+        },2000)
+      }else{
+        this.message = res['message'];
+        this.classMes = 'alert-danger';
+        this.processing = false;
+        this.enableForm();
+      }
+    });
+  }
+
+  checkEmail(){
+    this.auth.checkEmail(this.form.get('email').value).subscribe(res=>{
+      if(!res['success']){
+        this.emailValid = false;
+        this.emailMessage = res['message'];
+      }else{
+        this.emailValid = true;
+        this.emailMessage = res['message'];
+      }
+    })
+  }
+
+  checkUsername(){
+    this.auth.checkUserName(this.form.get('username').value).subscribe(res=>{
+      if(!res['success']){
+        this.usernameValid = false;
+        this.usernameMessage = res['message'];
+      }else{
+        this.usernameValid = true;
+        this.usernameMessage = res['message'];
+      }
+    })
   }
 
   ngOnInit() {

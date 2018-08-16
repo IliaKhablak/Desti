@@ -1,7 +1,7 @@
-const crypto = require('crypto').randomBytes(256).toString('hex');
+// const crypto = require('crypto').randomBytes(256).toString('hex');
 
 module.exports = {
     uri: 'mongodb://localhost:27017/DestiDB',
-    secret: crypto,
+    secret: 'the very big secret',
     db: 'DestiDB'
 }
