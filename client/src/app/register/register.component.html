@@ -1,0 +1,56 @@
+<h1>Register page</h1>
+
+
+<div class="row">
+  <form class="col s12" [formGroup]="form" (submit)="onRegisterSubmit()">
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="username" type="text" name="username" formControlName="username" [ngClass]="{'alert':(form.controls.username.errors && form.controls.username.dirty)}">
+        <label for="username">User name</label>
+        <div class="alert-danger" *ngIf="form.controls.username.errors?.required && form.controls.username.dirty" [@enterAnimation]>
+            This field is required
+        </div>
+        <div class="alert-danger" *ngIf="form.controls.username.errors?.minlength || form.controls.username.errors?.maxlength " [@enterAnimation]>
+            Minimum 3, maximum 15 characters
+        </div>
+        <div class="alert-danger" *ngIf="form.controls.username.errors?.validateUserName && form.controls.username.dirty && !form.controls.username.errors?.required" [@enterAnimation]>
+            You can use just letters and numbers
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="email" type="email" name="email" formControlName="email" [ngClass]="{'alert':(form.controls.email.errors && form.controls.email.dirty)}">
+        <label for="email">Email</label>
+        <div class="alert-danger" *ngIf="form.controls.email.errors?.required && form.controls.email.dirty" [@enterAnimation]>
+            This field is required
+        </div>
+        <div class="alert-danger" *ngIf="form.controls.email.errors?.validateEmail && form.controls.email.dirty && !form.controls.email.errors?.required" [@enterAnimation]>
+            Email is not valid
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="password" type="password" name="password" formControlName="password" [ngClass]="{'alert':(form.controls.password.errors && form.controls.password.dirty)}">
+        <label for="password">Password</label>
+        <div class="alert-danger" *ngIf="form.controls.password.errors?.required && form.controls.password.dirty" [@enterAnimation]>
+            This field is required
+        </div>
+        <div class="alert-danger" *ngIf="form.controls.password.errors?.validatePassword && !form.controls.password.errors?.required && form.controls.password.dirty" [@enterAnimation]>
+            Your password has to be minimum eight characters, at least one letter and one number
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="confirm" type="password" name="confirm" formControlName="confirm" [ngClass]="{'alert':(form.errors && form.controls.confirm.dirty)}">
+        <label for="confirm">Password confirmation</label>
+        <div class="alert-danger" *ngIf="form.errors?.matchingPassword && form.controls.confirm.dirty" [@enterAnimation]>
+            Password is not mutch
+        </div>
+      </div>
+    </div>
+    <button [disabled]="!form.valid" type="submit" class="waves-effect waves-teal btn" value="submit">submit</button>
+  </form>
+</div>
