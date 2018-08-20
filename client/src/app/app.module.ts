@@ -13,6 +13,12 @@ import {AuthService} from './services/auth.service';
 import { LoginComponent } from './login/login.component';
 import { ProfileComponent } from './profile/profile.component';
 import {FlashMessagesModule} from 'angular2-flash-messages';
+import {AuthGuard} from './services/auth-guard.service';
+import {AntiAuthGuard} from './services/antiAuth-guard.service';
+import { BlogComponent } from './blog/blog.component';
+import { MaterializeModule } from 'angular2-materialize';
+import {BlogService} from './services/blog.service';
+import {MasterService} from './services/master.service';
 
 @NgModule({
   declarations: [
@@ -22,7 +28,8 @@ import {FlashMessagesModule} from 'angular2-flash-messages';
     DashboardComponent,
     RegisterComponent,
     LoginComponent,
-    ProfileComponent
+    ProfileComponent,
+    BlogComponent
   ],
   imports: [
     BrowserModule,
@@ -30,9 +37,10 @@ import {FlashMessagesModule} from 'angular2-flash-messages';
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    FlashMessagesModule.forRoot()
+    FlashMessagesModule.forRoot(),
+    MaterializeModule
   ],
-  providers: [AuthService],
+  providers: [AuthService,AuthGuard,AntiAuthGuard,BlogService,MasterService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

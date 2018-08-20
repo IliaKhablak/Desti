@@ -6,7 +6,7 @@
   <form class="col s12" [formGroup]="form" (submit)="onRegisterSubmit()">
     <div class="row">
       <div class="input-field col s12">
-        <input id="username" type="text" name="username" formControlName="username" (keyup)="checkUsername()" [ngClass]="{'alert':((form.controls.username.errors || !usernameValid) && form.controls.username.dirty)}" >
+        <input id="username" type="text" name="username" formControlName="username" (keyup)="checkUsername()" [ngClass]="{'alert':((form.controls.username.errors || !usernameValid) && form.controls.username.dirty)}" autocomplete="off">
         <label for="username">User name</label>
         <div class="alert-danger" *ngIf="form.controls.username.errors?.required && form.controls.username.dirty" [@enterAnimation]>
             This field is required

@@ -139,6 +139,7 @@ export class RegisterComponent implements OnInit {
       if(res['success']){
         this.message = res['message'];
         this.classMes = 'alert-success';
+        this.auth.storeUserData(res['token'],res['user']);
         setTimeout(()=>{
           this.router.navigate(['/'])
         },2000)

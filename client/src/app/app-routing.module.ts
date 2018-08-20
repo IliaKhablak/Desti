@@ -5,13 +5,36 @@ import {DashboardComponent} from './dashboard/dashboard.component';
 import {RegisterComponent} from './register/register.component';
 import {LoginComponent} from './login/login.component';
 import {ProfileComponent} from './profile/profile.component';
+import {AuthGuard} from './services/auth-guard.service';
+import {AntiAuthGuard}  from './services/antiAuth-guard.service';
+import {BlogComponent} from './blog/blog.component';
 
 const appRoutes: Routes = [
   {path: '', component: HomeComponent},
-  {path: 'dashboard', component: DashboardComponent},
-  {path: 'register', component: RegisterComponent},
-  {path: 'login', component: LoginComponent},
-  {path: 'profile', component: ProfileComponent},
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'register', 
+    component: RegisterComponent,
+    canActivate: [AntiAuthGuard]
+  },
+  {
+    path: 'login', 
+    component: LoginComponent,
+    canActivate: [AntiAuthGuard]
+  },
+  {
+    path: 'profile', 
+    component: ProfileComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'blog',
+    component: BlogComponent
+  },
   {path: '**', component: HomeComponent}
   
 ];

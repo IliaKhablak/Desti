@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validator, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {trigger, animate, transition, style} from '@angular/animations';
 import {AuthService} from '../services/auth.service';
 import {Router} from '@angular/router';
-
+import { AuthGuard } from '../services/auth-guard.service';
 
 @Component({
   selector: 'app-login',
@@ -32,11 +32,13 @@ export class LoginComponent implements OnInit {
   processing:boolean = false;
   showPassword:boolean = true;
   showPassword2:string = 'password';
+  previousUrl;
 
   constructor(
     private formBuilder:FormBuilder,
     private auth:AuthService,
-    private router:Router
+    private router:Router,
+    private authGuard:AuthGuard
   ) {
     this.createForm();
   }
@@ -82,13 +84,23 @@ export class LoginComponent implements OnInit {
         this.classMes = 'alert-success';
         this.auth.storeUserData(res['token'],res['user']);
         setTimeout(()=>{
-          this.router.navigate(['/'])
+          if(this.previousUrl){
+            this.router.navigate([this.previousUrl])
+          }else{
+            this.router.navigate(['/'])
+          }
         },2000)
       }
     })
   }
 
   ngOnInit() {
+    if(this.authGuard.redirectUrl){
+      this.classMes = 'alert-danger';
+      this.message = 'You mast be loged in';
+      this.previousUrl = this.authGuard.redirectUrl;
+      this.authGuard.redirectUrl = undefined;
+    }
   }
 
 }

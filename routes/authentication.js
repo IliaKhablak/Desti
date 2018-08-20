@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const config = require('../config/database');
+const Blog = require('../models/blog');
 
 module.exports = (router)=>{
     router.post('/register', (req,res)=>{
@@ -39,7 +40,8 @@ module.exports = (router)=>{
                                 }
                             }
                         }else{
-                            res.json({success:true, message:'User saved!'})
+                            const token = jwt.sign({userId:user._id},config.secret,{expiresIn:'24h'});
+                            res.json({success:true,message:'User saved!',token:token, user:{username:user.username,email:user.email}})                        
                         }
                     });
                 }
@@ -103,8 +105,7 @@ module.exports = (router)=>{
                                 res.json({success:false,message:'Wrong password'})
                             }else{
                                 const token = jwt.sign({userId:user._id},config.secret,{expiresIn:'24h'});
-                                res.json({success:true,message:'Success!',token:token, user:{username:user.username,email:user.email
-                                }})
+                                res.json({success:true,message:'Success!',token:token, user:{username:user.username,email:user.email}})
                             }
                         }
                     }
@@ -112,6 +113,49 @@ module.exports = (router)=>{
             }
         }
     })
+
+    router.get('/allBlogs', (req,res)=>{
+        Blog.find({},(err,blogs)=>{
+            if(err){
+                res.json({success:false,message:err})
+            }else{
+                if(!blogs){
+                    res.json({success:false,message:'No blogs found'})
+                }else{
+                    res.json({success:true,blogs:blogs})
+                }
+            }
+        }).sort({'_id': -1}).limit(20);
+    }) 
+
+    router.get('/findBlog/:title', (req,res)=>{
+        console.log(req.params.title);
+        const title = req.params.title.toString();
+        if(!req.params.title){
+            res.json({success:false,message:'Nothig to search'})
+        }else{
+            Blog.find({title: new RegExp(title, "i")},(err,blog)=>{
+                if (err){
+                    res.json({success:false,message:err})
+                }else{
+                    res.json({success:true, blog: blog})
+                }
+            }).limit(20);
+        }
+    })
+
+    // router.use((req,res,next)=>{
+    //     const bla = [];
+    //     for(let i = 0;i<5000;i++){
+    //         bla[i] = {
+    //             title: 'Post No. '+i,
+    //             body: 'Description for post No. ' + i,
+    //             createdBy: 'ilia'
+    //         }
+    //     }
+    //     Blog.insertMany(bla);
+    //     next();
+    // })
 
     router.use((req,res,next)=>{
         const token = req.headers['authorization']

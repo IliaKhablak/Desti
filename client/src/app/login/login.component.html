@@ -24,7 +24,7 @@
     </div> -->
     <div class="row">
       <div class="input-field col s12">
-        <input id="email" type="email" name="email" formControlName="email">
+        <input id="email" type="email" name="email" formControlName="email" [ngClass]="{'alert':(form.controls.email.errors && form.controls.email.dirty)}">
         <label for="email">Email</label>
         <div class="alert-danger" *ngIf="form.controls.email.errors?.required && form.controls.email.dirty" [@enterAnimation]>
             This field is required
@@ -39,7 +39,7 @@
     </div>
     <div class="row">
       <div class="input-field col s11">
-        <input id="password" [type]="showPassword2" name="password" formControlName="password">
+        <input id="password" [type]="showPassword2" name="password" formControlName="password"  [ngClass]="{'alert':(form.controls.password.errors && form.controls.password.dirty)}">
         <label for="password">Password</label>
         <div class="alert-danger" *ngIf="form.controls.password.errors?.required && form.controls.password.dirty" [@enterAnimation]>
             This field is required
