@@ -140,15 +140,17 @@ export class BlogComponent implements OnInit {
   }
 
   deleteBlog(id){
-    this.blogService.deleteBlog(id).subscribe(res=>{
-      // console.log(res);
-      this.classMes = 'alert-success';
-      this.message = res['message'];
-      this.getAllBlogs();
-      setTimeout(()=>{
-        this.message = null;
-      },2000)
-    });
+    if(window.confirm('Are you sure you want to delete this blog?')){
+      this.blogService.deleteBlog(id).subscribe(res=>{
+        // console.log(res);
+        this.classMes = 'alert-success';
+        this.message = res['message'];
+        this.getAllBlogs();
+        setTimeout(()=>{
+          this.message = null;
+        },2000)
+      });
+    }
     // console.log(id);
   }
 }

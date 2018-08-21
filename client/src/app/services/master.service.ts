@@ -39,6 +39,11 @@ export class MasterService {
     return this.http.delete(this.domain+'/masters/deleteMaster/'+id,{headers:this.headers})
   }
 
+  updateMaster(master){
+    this.createAuthHeaders();
+    return this.http.put(this.domain+'/masters/update', master, {headers:this.headers})
+  }
+
   // findBlog(title){
   //   return this.http.get(this.domain + '/authentication/findBlog/' + title)
   // }

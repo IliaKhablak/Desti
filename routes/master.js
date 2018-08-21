@@ -55,23 +55,50 @@ module.exports = (router)=>{
                     if(masters.length < 1){
                         res.json({success:false,message:'There is no masters yet'})
                     }else{
-                        res.json({success:true, masters:masters})
+                        res.json({success:true, message:'Success!',masters:masters})
                     }
                 }
             })
         }
     })
 
-    router.route('/deleteBlog/:id').delete((req,res)=>{
-        Blog.remove({
+    router.route('/deleteMaster/:id').delete((req,res)=>{
+        Master.remove({
             _id: req.params.id
-        },(err,blog)=>{
+        },(err,master)=>{
             if(err){
                 res.json({success:false,message:err})
             }else{
-                res.json({success:true,message:'Blog successfully deleted'})
+                res.json({success:true,message:'Master successfully deleted'})
             }
         })
+    })
+
+    router.route('/update').put((req,res)=>{
+     if(!req.body['_id']){
+         res.json({success:false,message:'Master is not presented'})
+     }else{
+         Master.findById(req.body['_id'],(err,master)=>{
+             if(err){
+                 res.json({success:false,message:err})
+             }else{
+                 if(!master){
+                     res.json({success:false,message:'Master hase not found'})
+                 }else{
+                     master.name = req.body['name'];
+                     master.about = req.body['about'];
+                     master.skills = req.body['skills'];
+                     master.save((err,newMaster)=>{
+                         if (err){
+                             res.json({success:false,message:err})
+                         }else{
+                            res.json({success:true, message:'Master updated'})
+                         }
+                     })
+                 }
+             }
+         })
+     }
     })
     return router;
 }
