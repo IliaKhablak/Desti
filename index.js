@@ -24,11 +24,6 @@ mongoose.connect(config.uri, (err)=>{
 //     origin:'*'
 // }))
 
-function pingpong(ws) {
-    // console.log(ws.id+' send a ping');
-    ws.ping('coucou',{},true);
-} 
-
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
@@ -44,7 +39,13 @@ server.on('connection',ws=>{
         })
     })
     ws.send(JSON.stringify({type:'message', author:'Ilia',message:'Hello from server'}));
-    ws.timer=setInterval(()=>{pingpong(ws);},25000);
+    ws.timer=setInterval(()=>{
+        server.clients.forEach(client=>{
+            if(client.readyState === WebSocket.OPEN){
+                client.send(JSON.stringify({type:'keep alive'}));
+            }
+        })
+    },25000);
 })
 app.get('*', (req,res)=>{
     res.sendFile(path.join(__dirname + '/public/index.html'));
