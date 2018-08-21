@@ -36,11 +36,11 @@ module.exports = (router,server)=>{
                             res.json({success:false,message:err})
                         }
                     }else{
-                        // server.clients.forEach(client=>{
-                        //     if(client.readyState === WebSocket.OPEN){
-                        //         client.send(JSON.stringify({type:'blog'}));
-                        //     }
-                        // })
+                        server.clients.forEach(client=>{
+                            if(client.readyState === WebSocket.OPEN){
+                                client.send(JSON.stringify({type:'blog'}));
+                            }
+                        })
                         res.json({success:true,message:'Blog saved'})
                     }
                 })
@@ -55,11 +55,11 @@ module.exports = (router,server)=>{
             if(err){
                 res.json({success:false,message:err})
             }else{
-                // server.clients.forEach(client=>{
-                //     if(client.readyState === WebSocket.OPEN){
-                //         client.send(JSON.stringify({type:'blog'}));
-                //     }
-                // })
+                server.clients.forEach(client=>{
+                    if(client.readyState === WebSocket.OPEN){
+                        client.send(JSON.stringify({type:'blog'}));
+                    }
+                })
                 res.json({success:true,message:'Blog successfully deleted'})
             }
         })
