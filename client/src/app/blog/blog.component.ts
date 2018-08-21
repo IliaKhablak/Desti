@@ -49,8 +49,10 @@ export class BlogComponent implements OnInit {
     this.chat.message.subscribe(msg=>{
       if (msg['type'] === 'blog'){
         this.getAllBlogs();
-      }else{
+      }else if(msg['type'] === 'message'){
         this.incomeMessages.push(msg);
+      }else{
+        
       }
     })
   }
