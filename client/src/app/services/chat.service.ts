@@ -13,7 +13,7 @@ export interface Message {
 export class ChatService {
 
   public message: Subject<Message>;
-  CHAT_URL = 'ws://stormy-crag-43772.herokuapp.com';
+  CHAT_URL = 'wss://stormy-crag-43772.herokuapp.com';
 
   constructor(
     private wsService:WebsocketService
