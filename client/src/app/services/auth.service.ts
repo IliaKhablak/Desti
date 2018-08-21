@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {Observable} from "rxjs/Rx";
-import {tokenNotExpired} from 'angular2-jwt';
+import * as moment from "moment";
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +16,7 @@ export class AuthService {
 
   constructor(
     private http:HttpClient
+    // public jwtHelper: JwtHelperService
   ) {
   }
 
@@ -55,9 +56,11 @@ export class AuthService {
     localStorage.clear();
   }
 
-  storeUserData(token,user){
+  storeUserData(token,expiresIn,user){
+    const expiresAt = moment().add(expiresIn,'second');
     localStorage.setItem('token',token);
     localStorage.setItem('user',JSON.stringify(user));
+    localStorage.setItem("expires_at", JSON.stringify(expiresAt.valueOf()) );
     this.authToken = token;
     this.user = user;
   }
@@ -68,6 +71,12 @@ export class AuthService {
   }
 
   loggedIn(){
-    return tokenNotExpired();
+    return moment().isBefore(this.getExpiration());
   }
+
+  getExpiration() {
+    const expiration = localStorage.getItem("expires_at");
+    const expiresAt = JSON.parse(expiration);
+    return moment(expiresAt);
+  }    
 }

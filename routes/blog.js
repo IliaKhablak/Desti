@@ -2,9 +2,10 @@ const User = require('../models/user');
 const Blog = require('../models/blog');
 const jwt = require('jsonwebtoken');
 const config = require('../config/database');
+const WebSocket = require('ws');
 
-module.exports = (router)=>{
 
+module.exports = (router,server)=>{
     router.post('/newBlog', (req,res)=>{
         // console.log(req.body);
         if(!req.body['title']){
@@ -19,7 +20,7 @@ module.exports = (router)=>{
                     createdBy: req.body.createdBy
                 });
                 // console.log(blog);
-                blog.save((err)=>{
+                blog.save((err,blog)=>{
                     if(err){
                         if(err.errors){
                             if(err.errors.title){
@@ -35,6 +36,11 @@ module.exports = (router)=>{
                             res.json({success:false,message:err})
                         }
                     }else{
+                        server.clients.forEach(client=>{
+                            if(client.readyState === WebSocket.OPEN){
+                                client.send(JSON.stringify({type:'blog'}));
+                            }
+                        })
                         res.json({success:true,message:'Blog saved'})
                     }
                 })
@@ -49,6 +55,11 @@ module.exports = (router)=>{
             if(err){
                 res.json({success:false,message:err})
             }else{
+                server.clients.forEach(client=>{
+                    if(client.readyState === WebSocket.OPEN){
+                        client.send(JSON.stringify({type:'blog'}));
+                    }
+                })
                 res.json({success:true,message:'Blog successfully deleted'})
             }
         })

@@ -41,7 +41,7 @@ export class DashboardComponent implements OnInit {
   classMes:string;
   newPost = false;
   loadingBlog = false;
-  form: FormGroup;
+  form;
   processing = false;
   userName;
   allBlogs;
@@ -61,7 +61,7 @@ export class DashboardComponent implements OnInit {
 
 
   constructor(
-    private auth:AuthService,
+    public auth:AuthService,
     private masterService:MasterService,
     private formBuilder:FormBuilder
   ) {

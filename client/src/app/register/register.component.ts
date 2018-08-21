@@ -25,7 +25,7 @@ import {Router} from '@angular/router';
 })
 export class RegisterComponent implements OnInit {
 
-  form: FormGroup;
+  form;
   message:string;
   classMes:string;
   processing:boolean = false;
@@ -139,7 +139,7 @@ export class RegisterComponent implements OnInit {
       if(res['success']){
         this.message = res['message'];
         this.classMes = 'alert-success';
-        this.auth.storeUserData(res['token'],res['user']);
+        this.auth.storeUserData(res['token'],res['expiresIn'] ,res['user']);
         setTimeout(()=>{
           this.router.navigate(['/'])
         },2000)

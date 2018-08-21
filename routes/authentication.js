@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/database');
 const Blog = require('../models/blog');
 
+
 module.exports = (router)=>{
     router.post('/register', (req,res)=>{
         // console.log(req.body)
@@ -40,8 +41,8 @@ module.exports = (router)=>{
                                 }
                             }
                         }else{
-                            const token = jwt.sign({userId:user._id},config.secret,{expiresIn:'24h'});
-                            res.json({success:true,message:'User saved!',token:token, user:{username:user.username,email:user.email}})                        
+                            const token = jwt.sign({userId:user._id},config.secret,{expiresIn:86400});
+                            res.json({success:true,message:'User saved!',token:token, expiresIn:86400, user:{username:user.username,email:user.email}})                        
                         }
                     });
                 }
@@ -104,8 +105,8 @@ module.exports = (router)=>{
                             if(!validPass){
                                 res.json({success:false,message:'Wrong password'})
                             }else{
-                                const token = jwt.sign({userId:user._id},config.secret,{expiresIn:'24h'});
-                                res.json({success:true,message:'Success!',token:token, user:{username:user.username,email:user.email}})
+                                const token = jwt.sign({userId:user._id},config.secret,{expiresIn:86400});
+                                res.json({success:true,message:'Success!',token:token, expiresIn:86400, user:{username:user.username,email:user.email}})
                             }
                         }
                     }

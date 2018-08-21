@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import {MaterializeDirective} from "angular2-materialize";
 import {FormControl, FormGroup, FormBuilder, Validators} from '@angular/forms';
 import {trigger, animate, transition, style} from '@angular/animations';
 import {AuthService} from '../services/auth.service';
 import {BlogService} from '../services/blog.service';
+import {ChatService} from '../services/chat.service';
 
 @Component({
   selector: 'app-blog',
@@ -25,22 +26,37 @@ import {BlogService} from '../services/blog.service';
 })
 export class BlogComponent implements OnInit {
 
+ @ViewChild('valueSend') valueSend;
   message:string;
   classMes:string;
   newPost = false;
   loadingBlog = false;
-  form: FormGroup;
+  form;
   processing = false;
   userName;
   allBlogs;
   searchBloogs = [];
+  incomeMessages = [];
+  values = '';
 
   constructor(
     private formBuilder:FormBuilder,
-    private auth:AuthService,
-    private blogService:BlogService
+    public auth:AuthService,
+    private blogService:BlogService,
+    private chat:ChatService
   ) {
     this.createNewBlogForm();
+    this.chat.message.subscribe(msg=>{
+      if (msg['type'] === 'blog'){
+        this.getAllBlogs();
+      }else{
+        this.incomeMessages.push(msg);
+      }
+    })
+  }
+
+  onKey(event: any) { // without type info
+    this.values += event.target.value + ' | ';
   }
 
   createNewBlogForm(){
@@ -52,6 +68,28 @@ export class BlogComponent implements OnInit {
 
   newBlogForm(){
     this.newPost = true;
+  }
+
+  sendMes(event){
+    if(event.keyCode == 13){
+      let mes;
+      if(this.userName){
+       mes = {
+          type: 'message',
+          author: this.userName,
+          message: this.values
+        }
+      }else{
+       mes = {
+          type: 'message',
+          author: 'anonim',
+          message: this.values
+        }
+      }
+      
+      this.chat.message.next(mes);
+      this.valueSend.reset();
+    }
   }
 
   searchBlog(event){
@@ -96,7 +134,7 @@ export class BlogComponent implements OnInit {
        }else{
          this.classMes = 'alert-success';
          this.message = res['message'];
-         this.getAllBlogs();
+        //  this.getAllBlogs();
          setTimeout(()=>{
            this.newPost = false;
            this.processing = false;
@@ -134,7 +172,7 @@ export class BlogComponent implements OnInit {
 
   getAllBlogs(){
     this.blogService.getAllBlogs().subscribe(res=>{
-      console.log(res['blogs']);
+      // console.log(res['blogs']);
       this.allBlogs = res['blogs'];
     })
   }

@@ -4,11 +4,15 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const config = require('./config/database');
 const path = require('path');
+const WebSocket = require('ws');
+const server = new WebSocket.Server({port: 3000});
 const authentication = require('./routes/authentication')(router);
-const blogs = require('./routes/blog')(router);
+const blogs = require('./routes/blog')(router,server);
 const masters = require('./routes/master')(router);
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const port = process.env.PORT || 8080;
+
 mongoose.Promise = global.Promise;
 mongoose.connect(config.uri, (err)=>{
     if(err){console.log('can not connect to db: ', err)}
@@ -17,15 +21,25 @@ mongoose.connect(config.uri, (err)=>{
 app.use(cors({
     origin:'*'
 }))
+
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
-app.use(express.static(__dirname + '/client/dist/client'));
+app.use(express.static(__dirname + '/public'));
 app.use('/authentication', authentication);
 app.use('/blogs', blogs);
 app.use('/masters', masters);
-
+server.on('connection',ws=>{
+    ws.on('message',message=>{
+        server.clients.forEach(client=>{
+            if(client.readyState === WebSocket.OPEN){
+                client.send(message);
+            }
+        })
+    })
+    ws.send(JSON.stringify({type:'message', author:'Ilia',message:'Hello from server'}));
+})
 app.get('*', (req,res)=>{
-    res.sendFile(path.join(__dirname + '/client/dist/client/index.html'));
+    res.sendFile(path.join(__dirname + '/public/index.html'));
 });
 
-app.listen(8080, ()=>{console.log('Listening 8080')});
+app.listen(port, ()=>{console.log('Listening ' + port)});

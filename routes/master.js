@@ -85,6 +85,7 @@ module.exports = (router)=>{
                  if(!master){
                      res.json({success:false,message:'Master hase not found'})
                  }else{
+                    //  console.log(req.decoded.userId)
                      master.name = req.body['name'];
                      master.about = req.body['about'];
                      master.skills = req.body['skills'];

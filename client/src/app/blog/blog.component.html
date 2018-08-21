@@ -6,6 +6,17 @@
 <a [class.disabled]="loadingBlog" class="waves-effect waves-light btn" *ngIf="!newPost" (click)="reloadBlog()">Reload<i class="material-icons left">refresh</i></a>
 <br>
 <br>
+<div class="input-field">
+  <input [(ngModel)]="values" (keypress)="sendMes($event)" #valueSend="ngModel" type="text" id="messages">
+  <label for="messages">Send message</label>
+</div>
+<button class="waves-effect waves-teal btn" (click)="sendMes({keyCode: 13})">Send</button>
+<br>
+<div class="row">
+  <div class="col s12 m12 l12" *ngFor="let mes of incomeMessages" [@enterAnimation]>
+    <p>{{mes.author}} sayd: {{mes.message}}</p>
+  </div>
+</div>
 <div class="row">
   <form class="col s12" [formGroup]="form" (submit)="onBlogSubmit()" *ngIf="newPost">
       <div class="row">

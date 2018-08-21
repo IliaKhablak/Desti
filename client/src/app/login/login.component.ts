@@ -26,7 +26,7 @@ import { AuthGuard } from '../services/auth-guard.service';
 })
 export class LoginComponent implements OnInit {
 
-  form: FormGroup;
+  form;
   message:string;
   classMes:string;
   processing:boolean = false;
@@ -82,7 +82,7 @@ export class LoginComponent implements OnInit {
       }else{
         this.message = res['message'];
         this.classMes = 'alert-success';
-        this.auth.storeUserData(res['token'],res['user']);
+        this.auth.storeUserData(res['token'],res['expiresIn'],res['user']);
         setTimeout(()=>{
           if(this.previousUrl){
             this.router.navigate([this.previousUrl])

@@ -19,6 +19,9 @@ import { BlogComponent } from './blog/blog.component';
 import { MaterializeModule } from 'angular2-materialize';
 import {BlogService} from './services/blog.service';
 import {MasterService} from './services/master.service';
+import {WebsocketService} from './services/websocket.service';
+import {ChatService} from './services/chat.service';
+// import { JwtHelperService } from '@auth0/angular-jwt';
 
 @NgModule({
   declarations: [
@@ -41,7 +44,16 @@ import {MasterService} from './services/master.service';
     MaterializeModule,
     FormsModule
   ],
-  providers: [AuthService,AuthGuard,AntiAuthGuard,BlogService,MasterService],
+  providers: [
+    AuthService,
+    AuthGuard,
+    AntiAuthGuard,
+    BlogService,
+    MasterService,
+    WebsocketService,
+    ChatService,
+    // JwtHelperService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
