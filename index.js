@@ -44,4 +44,4 @@ app.get('*', (req,res)=>{
     res.sendFile(path.join(__dirname + '/public/index.html'));
 });
 
-app.listen(port, ()=>{console.log('Listening ' + port)});
+httpServer.listen(port, ()=>{console.log('Listening ' + port)});
