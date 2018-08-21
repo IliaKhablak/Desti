@@ -1,16 +1,18 @@
 const express = require('express');
 const app = express();
+const http = require('http');
+const httpServer = http.createServer(app);
 const router = express.Router();
 const mongoose = require('mongoose');
 const config = require('./config/database');
 const path = require('path');
 const WebSocket = require('ws');
-const server = new WebSocket.Server({port: process.env.PORT || 3000});
+const server = new WebSocket.Server({'server': httpServer});
 const authentication = require('./routes/authentication')(router);
 const blogs = require('./routes/blog')(router,server);
 const masters = require('./routes/master')(router);
 const bodyParser = require('body-parser');
-const cors = require('cors');
+// const cors = require('cors');
 const port = process.env.PORT || 8080;
 
 mongoose.Promise = global.Promise;
