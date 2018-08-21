@@ -8,7 +8,7 @@ import * as moment from "moment";
 })
 export class AuthService {
 
-  domain = 'https://secure-scrubland-98340.herokuapp.com';
+  domain = 'https://stormy-crag-43772.herokuapp.com';
   authToken;
   user;
   options;
