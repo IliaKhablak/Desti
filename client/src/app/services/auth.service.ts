@@ -8,7 +8,7 @@ import * as moment from "moment";
 })
 export class AuthService {
 
-  domain = 'http://localhost:8080';
+  domain = 'https://secure-scrubland-98340.herokuapp.com';
   authToken;
   user;
   options;

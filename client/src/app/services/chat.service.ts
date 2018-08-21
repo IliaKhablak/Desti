@@ -13,7 +13,7 @@ export interface Message {
 export class ChatService {
 
   public message: Subject<Message>;
-  CHAT_URL = 'ws://localhost:3000';
+  CHAT_URL = 'ws://secure-scrubland-98340.herokuapp.com';
 
   constructor(
     private wsService:WebsocketService
