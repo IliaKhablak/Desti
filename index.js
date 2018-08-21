@@ -4,19 +4,13 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const config = require('./config/database');
 const path = require('path');
-const SocketServer = require('ws').Server;
-const PORT = process.env.PORT || 3000;
-const INDEX = path.join(__dirname, '/public/index.html');
-const server = express()
-    .use((req, res) => res.sendFile(INDEX) )
-    .listen(PORT, () => console.log(`Listening on ${ PORT }`));
-const wss = new SocketServer({ server });
-// const server = new WebSocket.Server({port: 3000});
+const WebSocket = require('ws');
+const server = new WebSocket.Server({port: process.env.PORT || 3000});
 const authentication = require('./routes/authentication')(router);
-const blogs = require('./routes/blog')(router,wss);
+const blogs = require('./routes/blog')(router,server);
 const masters = require('./routes/master')(router);
 const bodyParser = require('body-parser');
-// const cors = require('cors');
+const cors = require('cors');
 const port = process.env.PORT || 8080;
 
 mongoose.Promise = global.Promise;
@@ -34,9 +28,9 @@ app.use(express.static(__dirname + '/public'));
 app.use('/authentication', authentication);
 app.use('/blogs', blogs);
 app.use('/masters', masters);
-wss.on('connection',ws=>{
+server.on('connection',ws=>{
     ws.on('message',message=>{
-        wss.clients.forEach(client=>{
+        server.clients.forEach(client=>{
             if(client.readyState === WebSocket.OPEN){
                 client.send(message);
             }
