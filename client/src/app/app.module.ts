@@ -21,6 +21,7 @@ import {BlogService} from './services/blog.service';
 import {MasterService} from './services/master.service';
 import {WebsocketService} from './services/websocket.service';
 import {ChatService} from './services/chat.service';
+import { CheduleComponent } from './chedule/chedule.component';
 // import { JwtHelperService } from '@auth0/angular-jwt';
 
 @NgModule({
@@ -32,7 +33,8 @@ import {ChatService} from './services/chat.service';
     RegisterComponent,
     LoginComponent,
     ProfileComponent,
-    BlogComponent
+    BlogComponent,
+    CheduleComponent
   ],
   imports: [
     BrowserModule,

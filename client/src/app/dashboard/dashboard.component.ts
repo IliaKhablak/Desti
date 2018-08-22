@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {MasterService} from '../services/master.service';
 import {FormControl, FormGroup, FormBuilder, Validators, FormArray} from '@angular/forms';
@@ -37,6 +37,7 @@ import {trigger, animate, transition, style} from '@angular/animations';
 })
 export class DashboardComponent implements OnInit {
 
+ 
   message:string;
   classMes:string;
   newPost = false;
@@ -47,31 +48,41 @@ export class DashboardComponent implements OnInit {
   allBlogs;
   searchBloogs = [];
   controls;
-  category = [
-    'nails',
-    'eyelashes',
-    'piatochki'
-  ];
+  category = [];
   username;
   editTodos = [];
   formEdit;
   editControls;
   editProcess = false;
-
-
+  newCatTriger = false;
+  checkCat = true;
+  values = '';
+  inpValue;
 
   constructor(
     public auth:AuthService,
     private masterService:MasterService,
     private formBuilder:FormBuilder
   ) {
-    this.controls = this.category.map(c=> new FormControl(false));
-    this.createNewMasterForm();
+    this.masterService.getAllCategories().subscribe(res=>{
+      // console.log(res);
+      this.category = res['categories'].category;
+      this.controls = this.category.map(c=> new FormControl(false));
+      this.createNewMasterForm();
+    })
   }
+
+  // updateCat(){
+  //   this.masterService.getAllCategories().subscribe(res=>{
+  //     // console.log(res);
+  //     this.category = res['categories'].category;
+  //     this.controls = this.category.map(c=> new FormControl(false));
+  //   })
+  // }
 
   ngOnInit(){
     this.auth.getProfile().subscribe(res=>{
-      // console.log(res['user'].u);
+      // console.log(res);
       this.username = res['user'].username;
       this.masterService.getAllMasters(res['user'].username).subscribe(res=>{
         if(!res['success']){
@@ -114,7 +125,9 @@ export class DashboardComponent implements OnInit {
     this.formEdit = this.formBuilder.group({
       name: [todo.name, Validators.required],
       about: todo.about,
-      skills: new FormArray(this.editControls,this.validateUserName)
+      skills: new FormArray(this.editControls,this.validateUserName),
+      newCatTriger:false,
+      values:''
     });
     if(this.allBlogs.includes(todo)){
       if(!this.editTodos.includes(todo)){
@@ -123,10 +136,66 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  onKeyPress(event,param){
+    if(event.keyCode == 13 && this.checkCat){
+      let category = {
+        category: this.values.toLowerCase()
+      }
+      this.masterService.newCategory(category)
+        .subscribe(res=>{
+          if(res['success']){
+            this.classMes = 'alert-success';
+            this.message = res['message'];
+            // let newOne = this.values;
+            this.values = '';
+            this.category = res['category'].category;
+            this.controls = this.category.map(c=> new FormControl(false));
+            // this.inpValue = '';
+            if(!param){
+              // this.myInput2.nativeElement.value = '';
+              this.formEdit.controls['values'].setValue('');
+              this.formEdit.controls['newCatTriger'].setValue(false);
+              this.formEdit.controls['skills'].push(this.controls[this.controls.length - 1]);
+            }else{
+              // this.myInput.nativeElement.value = '';
+              this.form.controls['values'].setValue('');
+              this.form.controls['newCatTriger'].setValue(false);
+              this.form.controls['skills'].push(this.controls[this.controls.length - 1]);
+            }
+            setTimeout(()=>{
+              this.message = null;
+            },2000)
+          }else{
+            this.classMes = 'alert-danger';
+            this.message = res['message'];
+          }
+        });
+    }
+  }
+
+  onSearchChange(event){
+    this.values = event.target.value;
+    if(this.category.indexOf(event.target.value.toLowerCase()) > -1){
+      this.checkCat = false;
+    }else{
+      this.checkCat = true;
+    }
+  }
+
+  // onSearchChange2(event){
+  //   this.values = event.target.value;
+  //   if(this.category.indexOf(event.target.value.toLowerCase()) > -1){
+  //     this.checkCat = false;
+  //   }else{
+  //     this.checkCat = true;
+  //   }
+  // }
+
+
   submitMaster(event,master){
     // console.log(master);
     
-    if(event.keyCode == 13 && !this.formEdit.controls.name.errors && !this.formEdit.controls.skills.errors){
+    if(event.keyCode == 13 && !this.formEdit.controls.name.errors && !this.formEdit.controls.skills.errors && !this.formEdit.get('newCatTriger').value){
       const selectedOrderIds = this.formEdit.value.skills
       .map((v, i) => v ? this.category[i] : null)
       .filter(v => v !== null);
@@ -163,7 +232,9 @@ export class DashboardComponent implements OnInit {
     this.form = this.formBuilder.group({
       name:['',Validators.required],
       about:'',
-      skills: new FormArray(this.controls,this.validateUserName)
+      skills: new FormArray(this.controls,this.validateUserName),
+      newCatTriger:false,
+      values:''
     })
   }
 
@@ -176,7 +247,7 @@ export class DashboardComponent implements OnInit {
 
   onMasterSubmit(){
     this.processing = true;
-    this.disableForm();
+    // this.disableForm();
     const selectedOrderIds = this.form.value.skills
       .map((v, i) => v ? this.category[i] : null)
       .filter(v => v !== null);
@@ -186,12 +257,13 @@ export class DashboardComponent implements OnInit {
       createdBy: this.username,
       skills: selectedOrderIds
     }
+    // console.log(master);
     this.masterService.newMaster(master).subscribe(res=>{
       if(!res['success']){
         this.classMes = 'alert-danger';
         this.message = res['message'];
         this.processing = false;
-        this.enableForm();
+        // this.enableForm();
       }else{
         this.classMes = 'alert-success';
         this.message = res['message'];
@@ -204,7 +276,7 @@ export class DashboardComponent implements OnInit {
           this.processing = false;
           this.message = null;
           this.form.reset();
-          this.enableForm();
+          // this.enableForm();
         },2000)
       }
     })

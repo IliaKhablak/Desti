@@ -3,9 +3,10 @@ const Blog = require('../models/blog');
 const Master = require('../models/master');
 const jwt = require('jsonwebtoken');
 const config = require('../config/database');
+const Category = require('../models/category');
+
 
 module.exports = (router)=>{
-
     router.post('/newMaster', (req,res)=>{
         if(!req.body['name']){
             res.json({success:false,message:'Master name is required.'})
@@ -40,6 +41,49 @@ module.exports = (router)=>{
                     }
                 })
             }
+        }
+    })
+
+    router.route('/allCategories').get((req,res)=>{
+        Category.findById("5b7cee683555323a73212033",(err,categories)=>{
+            if(err){
+                res.json({success:false,message:err})
+            }else{
+                if(!categories){
+                    res.json({success:false,message:'There is some problem on the serrver'})
+                }else{
+                    res.json({success:true,message:'Success', categories:categories})
+                }
+            }
+        })
+    })
+
+    router.route('/newCategory').post((req,res)=>{
+        if(!req.body['category']){
+            res.json({success:false,message:'No category to save'})
+        }else{
+            Category.findById("5b7cee683555323a73212033",(err,category)=>{
+                if(err){
+                    res.json({success:false,message:err})
+                }else{
+                    if(!category){
+                        res.json({success:false,message:'There is some problems on a server'})
+                    }else{
+                        if(category.category.includes(req.body['category'])){
+                            res.json({success:false,message:'This category already exists'})
+                        }else{
+                            category.category.push(req.body['category']);
+                            category.save((err,category)=>{
+                                if(err){
+                                    res.json({success:false,message:err})
+                                }else{
+                                    res.json({success:true,message:'Success',category:category})
+                                }
+                            })
+                        }
+                    }
+                }
+            })
         }
     })
 

@@ -56,11 +56,7 @@ export class BlogComponent implements OnInit {
       }
     })
   }
-
-  onKey(event: any) { // without type info
-    this.values += event.target.value + ' | ';
-  }
-
+  
   createNewBlogForm(){
     this.form = this.formBuilder.group({
       title:['',Validators.required],

@@ -8,6 +8,7 @@ import {ProfileComponent} from './profile/profile.component';
 import {AuthGuard} from './services/auth-guard.service';
 import {AntiAuthGuard}  from './services/antiAuth-guard.service';
 import {BlogComponent} from './blog/blog.component';
+import {CheduleComponent} from './chedule/chedule.component';
 
 const appRoutes: Routes = [
   {path: '', component: HomeComponent},
@@ -34,6 +35,11 @@ const appRoutes: Routes = [
   {
     path: 'blog',
     component: BlogComponent
+  },
+  {
+    path: 'schedule',
+    component: CheduleComponent,
+    canActivate: [AuthGuard]
   },
   {path: '**', component: HomeComponent}
   

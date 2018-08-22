@@ -44,7 +44,13 @@ export class MasterService {
     return this.http.put(this.domain+'/masters/update', master, {headers:this.headers})
   }
 
-  // findBlog(title){
-  //   return this.http.get(this.domain + '/authentication/findBlog/' + title)
-  // }
+  getAllCategories(){
+    this.createAuthHeaders();
+    return this.http.get(this.domain + '/masters/allCategories',{headers:this.headers})
+  }
+
+  newCategory(category){
+    this.createAuthHeaders();
+    return this.http.post(this.domain + '/masters/newCategory',category,{headers:this.headers})
+  }
 }

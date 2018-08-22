@@ -3,6 +3,7 @@
   <div class="nav-wrapper">
     <a routerLink="/" class="brand-logo">HOME</a>
     <ul id="nav-mobile" class="right hide-on-med-and-down">
+      <li *ngIf="auth.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}"><a routerLink="/schedule">Schedule</a></li>
       <li *ngIf="auth.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}"><a routerLink="/dashboard">Dashboard</a></li>
       <li *ngIf="auth.loggedIn()" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}"><a routerLink="/profile">Profile</a></li>
       <li [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}"><a routerLink="/blog">Blog</a></li>

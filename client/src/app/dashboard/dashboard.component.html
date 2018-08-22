@@ -1,8 +1,8 @@
 <h1>Blog page</h1>
 <br>
-<div *ngIf="message" [ngClass]="classMes" [@enterAnimation2] style="position:fixed;top:100px;left:50%;">{{message}}</div>
+<div *ngIf="message" [ngClass]="classMes" [@enterAnimation2] style="position:fixed;top:100px;left:50%;z-index: 100;">{{message}}</div>
 <br>
-<a class="waves-effect waves-light btn" *ngIf="!newPost && auth.loggedIn()" (click)="newMasterForm()">New master</a>
+<a [class.disabled]="editProcess" class="waves-effect waves-light btn" *ngIf="!newPost && auth.loggedIn()" (click)="newMasterForm()">New master</a>
 <!-- <a [class.disabled]="loadingBlog" class="waves-effect waves-light btn" *ngIf="!newPost" (click)="reloadBlog()">Reload<i class="material-icons left">refresh</i></a> -->
 <br>
 <br>
@@ -28,8 +28,23 @@
             <input type="checkbox" [id]="i" [formControlName]="i"/>
             <label [for]="i">{{category[i]}}</label>
         </div>
-        <div [class.alert-danger]="form.controls.skills.errors" class="alert-transparent"><b *ngIf="form.controls.skills.errors" [@enterAnimation2]>At least one skill has to be selected</b></div>
+        <div >
+          <input type="checkbox" id="bla" name="newCatTriger" formControlName="newCatTriger"/>
+          <label for="bla">Add custom category</label>
       </div>
+      <div class="row" *ngIf="form?.get('newCatTriger').value" [@enterAnimation2]>
+          <div class="input-field col s12">
+            <input id="newCat" type="text" (input)="onSearchChange($event)" (keypress)="onKeyPress($event,true)" autocomplete="off" name="values" formControlName="values" [ngClass]="{'alert':!checkCat}">
+            <label for="newCat">New category</label>
+            <div class="alert-danger" *ngIf="!checkCat" [@enterAnimation]>
+              This category already exists
+            </div>
+          </div>
+        </div>
+        <!-- <a style="display:block;position: relative;z-index:2;" (click)="newCatTrig()"><i class="material-icons left">add</i></a> -->
+        <div style="top:30px;" [class.alert-danger]="form.controls.skills.errors" class="alert-transparent"><b *ngIf="form.controls.skills.errors" [@enterAnimation2]>At least one skill has to be selected</b></div>
+      </div>
+      
       <!-- <div class="row">
         <div class="input-field col s12">
           <textarea id="body" class="materialize-textarea" name="body" formControlName="body" rows="8" cols="80" [ngClass]="{'alert':(form.controls.body.errors && form.controls.body.dirty)}"></textarea>
@@ -97,8 +112,22 @@
                         <input type="checkbox" [id]="i" [formControlName]="i"/>
                         <label [for]="i">{{category[i]}}</label>
                     </div>
+                    <div >
+                        <input type="checkbox" id="bla2" name="newCatTriger" formControlName="newCatTriger"/>
+                        <label for="bla2">Add custom category</label>
+                    </div>
+                    <div class="row" *ngIf="formEdit?.get('newCatTriger').value" [@enterAnimation2]>
+                        <div class="input-field col s12">
+                          <input id="newCat2" type="text" (input)="onSearchChange($event)" (keypress)="onKeyPress($event,false)" autocomplete="off" name="values" formControlName="values" [ngClass]="{'alert':!checkCat}">
+                          <label for="newCat2">New category</label>
+                          <div class="alert-danger" *ngIf="!checkCat" [@enterAnimation]>
+                            This category already exists
+                          </div>
+                        </div>
+                      </div>
                     <div [class.alert-danger]="formEdit.controls.skills.errors" class="alert-transparent"><b *ngIf="formEdit.controls.skills.errors" [@enterAnimation2]>At least one skill has to be selected</b></div>
                   </div>
+
                   <!-- <div class="row">
                     <div class="input-field col s12">
                       <textarea id="body" class="materialize-textarea" name="body" formControlName="body" rows="8" cols="80" [ngClass]="{'alert':(form.controls.body.errors && form.controls.body.dirty)}"></textarea>
