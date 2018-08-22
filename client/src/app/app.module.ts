@@ -23,6 +23,8 @@ import {WebsocketService} from './services/websocket.service';
 import {ChatService} from './services/chat.service';
 import { CheduleComponent } from './chedule/chedule.component';
 // import { JwtHelperService } from '@auth0/angular-jwt';
+import { AngularDateTimePickerModule } from 'angular2-datetimepicker';
+
 
 @NgModule({
   declarations: [
@@ -44,7 +46,8 @@ import { CheduleComponent } from './chedule/chedule.component';
     BrowserAnimationsModule,
     FlashMessagesModule.forRoot(),
     MaterializeModule,
-    FormsModule
+    FormsModule,
+    AngularDateTimePickerModule
   ],
   providers: [
     AuthService,

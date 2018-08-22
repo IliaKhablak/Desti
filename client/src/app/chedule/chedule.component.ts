@@ -1,8 +1,8 @@
 import { Component, OnInit, EventEmitter} from '@angular/core';
 import {trigger, animate, transition, style} from '@angular/animations';
-import {MaterializeAction, MaterializeDirective} from "angular2-materialize";
-import {FormBuilder, FormGroup, FormControl} from '@angular/forms';
-import * as $ from 'jquery';
+import {AuthService} from '../services/auth.service';
+import {MasterService} from '../services/master.service';
+// import {MaterializeAction, MaterializeDirective} from "angular2-materialize";
 
 @Component({
   selector: 'app-chedule',
@@ -39,44 +39,61 @@ export class CheduleComponent implements OnInit {
 
   message:string;
   classMes:string;
-  birthDate:string;
-  birthTime:string;
+  // birthDate:string;
+  // birthTime:string;
 
-  birthDateActions = new EventEmitter<string|MaterializeAction>();
-  birthTimeActions = new EventEmitter<string|MaterializeAction>();
-  form: FormGroup;
+  // birthDateActions = new EventEmitter<string|MaterializeAction>();
+  // birthTimeActions = new EventEmitter<string|MaterializeAction>();
+  date: Date = new Date();
+    settings = {
+        bigBanner: true,
+        timePicker: false,
+        format: 'dd-MM-yyyy',
+        defaultOpen: true
+    }
+  username;
+  masters;
 
 
+  constructor(
+    public auth:AuthService,
+    private masterServise:MasterService
+  ){
+      this.auth.getProfile().subscribe(res=>{
+        this.username = res['user'].username;
+        this.masterServise.getAllMasters(this.username).subscribe(res=>{
+          this.masters = res['masters'];
+        })
+      })
+      // var utc = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+      // document.write(utc);
 
-  constructor(private fb: FormBuilder) {
-      this.birthDate = "03/12/2017";
-      this.birthTime = "12:36";
-      this.form = this.fb.group({
-          'fromDate': new FormControl('06/07/2017'),
-          'fromTime': new FormControl('08:30')
-      });
+      // this.birthDate = utc;
+      // this.birthTime = "12:36";
   }
 
-  openDatePicker() {
-      //actions are open or close
-      this.birthDateActions.emit({action: "pickadate", params: ["open"]});
-      $('.picker__date-display').append("<h3>Hi there!</h3>");
+  onDateSelect(){
+    console.log(this.date);
+    // console.log('hi');
   }
+  // bla(){
+  //   console.log(this.birthDate);
+  // }
 
-  setTime(time) {
-      this.birthTime = time;
-  }
+  // openDatePicker() {
+  //   //actions are open or close
+  //   this.birthDateActions.emit({action: "pickadate", params: ["open"]});
+  // }
 
-  openTimePicker() {
-      //actions are show or hide
-      this.birthTimeActions.emit({action: "pickatime", params: ["show"]});
-  }
+  // setTime(time) {
+  //     this.birthTime = time;
+  // }
 
-  bla(){
-    console.log('date');
-  }
-
+  // openTimePicker() {
+  //     //actions are show or hide
+  //     this.birthTimeActions.emit({action: "pickatime", params: ["show"]});
+  // }
+  
   ngOnInit(){
-    $( "#datepicker" ).datepicker();
   }
 }
