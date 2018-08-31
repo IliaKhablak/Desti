@@ -2,9 +2,9 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const config = require('../config/database');
 const Blog = require('../models/blog');
+const WebSocket = require('ws');
 
-
-module.exports = (router)=>{
+module.exports = (router,server)=>{
     router.post('/register', (req,res)=>{
         // console.log(req.body)
         if(!req.body.email){
@@ -42,7 +42,7 @@ module.exports = (router)=>{
                             }
                         }else{
                             const token = jwt.sign({userId:user._id},config.secret,{expiresIn:86400});
-                            res.json({success:true,message:'User saved!',token:token, expiresIn:86400, user:{username:user.username,email:user.email}})                        
+                            res.json({success:true,message:'User saved!',token:token, expiresIn:86400, user:{userId:user._id,email:user.email,business:user.business}})                        
                         }
                     });
                 }
@@ -106,7 +106,7 @@ module.exports = (router)=>{
                                 res.json({success:false,message:'Wrong password'})
                             }else{
                                 const token = jwt.sign({userId:user._id},config.secret,{expiresIn:86400});
-                                res.json({success:true,message:'Success!',token:token, expiresIn:86400, user:{username:user.username,email:user.email}})
+                                res.json({success:true,message:'Success!',token:token, expiresIn:86400, user:{userId:user._id,email:user.email,business:user.business}})
                             }
                         }
                     }
@@ -130,7 +130,7 @@ module.exports = (router)=>{
     }) 
 
     router.get('/findBlog/:title', (req,res)=>{
-        console.log(req.params.title);
+        // console.log(req.params.title);
         const title = req.params.title.toString();
         if(!req.params.title){
             res.json({success:false,message:'Nothig to search'})
@@ -158,16 +158,18 @@ module.exports = (router)=>{
     //     next();
     // })
 
-    router.use((req,res,next)=>{
+    router.use( (req,res,next)=>{
         const token = req.headers['authorization']
         if(!token){
             res.json({success:false, message:'No token provided'})
         }else{
-            jwt.verify(token,config.secret,(err,decoded)=>{
+            jwt.verify(token,config.secret, (err,decoded)=>{
                 if(err){
                     res.json({success:false,message:'Token invalid'+err})
                 }else{
                     req.decoded = decoded;
+                    server.userId = decoded.userId;
+                    // console.log('two');
                     next();
                 }
             })

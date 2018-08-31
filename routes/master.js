@@ -18,7 +18,7 @@ module.exports = (router)=>{
                     name: req.body.name,
                     about: req.body.about,
                     skills: req.body.skills,
-                    createdBy: req.body.createdBy
+                    _userId: req.decoded.userId
                 });
                 // console.log(blog);
                 master.save((err)=>{
@@ -30,7 +30,7 @@ module.exports = (router)=>{
                                 if(err.errors.skills){
                                     res.json({success:false,message:err.errors.skills.message})
                                 }else{
-                                    res.json({success:false,message:err.errors.createdBy.message})
+                                    res.json({success:false,message:err.errors._userId.message})
                                 }
                             }
                         }else{
@@ -45,7 +45,7 @@ module.exports = (router)=>{
     })
 
     router.route('/allCategories').get((req,res)=>{
-        Category.findById("5b7cee683555323a73212033",(err,categories)=>{
+        Category.findById(config.categoryId,(err,categories)=>{
             if(err){
                 res.json({success:false,message:err})
             }else{
@@ -62,7 +62,7 @@ module.exports = (router)=>{
         if(!req.body['category']){
             res.json({success:false,message:'No category to save'})
         }else{
-            Category.findById("5b7cee683555323a73212033",(err,category)=>{
+            Category.findById(config.categoryId,(err,category)=>{
                 if(err){
                     res.json({success:false,message:err})
                 }else{
@@ -87,17 +87,17 @@ module.exports = (router)=>{
         }
     })
 
-    router.get('/allMasters/:username', (req,res)=>{
+    router.get('/allMasters', (req,res)=>{
         // console.log(req.params.username);
-        if(!req.params.username){
+        if(!req.decoded.userId){
             res.json({success:false,message:'No username presented'})
         }else{
-            Master.find({createdBy: req.params.username},(err,masters)=>{
+            Master.find({_userId: req.decoded.userId},(err,masters)=>{
                 if (err){
                     res.json({success:false,message:err})
                 }else{
                     if(masters.length < 1){
-                        res.json({success:false,message:'There is no masters yet'})
+                        res.json({success:false,message:'There is no masters yet',masters:[]})
                     }else{
                         res.json({success:true, message:'Success!',masters:masters})
                     }

@@ -44,7 +44,12 @@
         <!-- <a style="display:block;position: relative;z-index:2;" (click)="newCatTrig()"><i class="material-icons left">add</i></a> -->
         <div style="top:30px;" [class.alert-danger]="form.controls.skills.errors" class="alert-transparent"><b *ngIf="form.controls.skills.errors" [@enterAnimation2]>At least one skill has to be selected</b></div>
       </div>
-      
+      <input 
+        style="display: none" 
+        type="file" (change)="onFileChanged($event)" 
+        #fileInput>
+      <button (click)="fileInput.click()">Select File</button>
+      <br>
       <!-- <div class="row">
         <div class="input-field col s12">
           <textarea id="body" class="materialize-textarea" name="body" formControlName="body" rows="8" cols="80" [ngClass]="{'alert':(form.controls.body.errors && form.controls.body.dirty)}"></textarea>

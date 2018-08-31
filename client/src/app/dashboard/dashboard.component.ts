@@ -37,7 +37,7 @@ import {trigger, animate, transition, style} from '@angular/animations';
 })
 export class DashboardComponent implements OnInit {
 
- 
+  user;
   message:string;
   classMes:string;
   newPost = false;
@@ -58,6 +58,7 @@ export class DashboardComponent implements OnInit {
   checkCat = true;
   values = '';
   inpValue;
+  selectedFile: File;
 
   constructor(
     public auth:AuthService,
@@ -80,21 +81,28 @@ export class DashboardComponent implements OnInit {
   //   })
   // }
 
+  onFileChanged(event) {
+    this.selectedFile = event.target.files[0]
+  }
+
   ngOnInit(){
-    this.auth.getProfile().subscribe(res=>{
-      // console.log(res);
-      this.username = res['user'].username;
-      this.masterService.getAllMasters(res['user'].username).subscribe(res=>{
-        if(!res['success']){
-          this.classMes = 'alert-danger';
-          this.message = res['message'];
-          setTimeout(()=>{
-            this.message = null;
-          },3000)
-        }else{
-          this.allBlogs = res['masters'];
-        }
-      })
+    if(this.auth.user.value === null){
+      this.auth.getUser();
+      this.auth.user.subscribe(res=>this.user = res)
+    }else{
+      this.auth.user.subscribe(res=>this.user = res)
+    }
+    this.username = this.user.username;
+    this.masterService.getAllMasters().subscribe(res=>{
+      if(!res['success']){
+        this.classMes = 'alert-danger';
+        this.message = res['message'];
+        setTimeout(()=>{
+          this.message = null;
+        },3000)
+      }else{
+        this.allBlogs = res['masters'];
+      }
     })
   }
 
@@ -193,8 +201,6 @@ export class DashboardComponent implements OnInit {
 
 
   submitMaster(event,master){
-    // console.log(master);
-    
     if(event.keyCode == 13 && !this.formEdit.controls.name.errors && !this.formEdit.controls.skills.errors && !this.formEdit.get('newCatTriger').value){
       const selectedOrderIds = this.formEdit.value.skills
       .map((v, i) => v ? this.category[i] : null)
@@ -212,7 +218,7 @@ export class DashboardComponent implements OnInit {
           this.editProcess = false;
           this.message = res['message'];
           this.classMes = 'alert-success';
-          this.masterService.getAllMasters(this.username).subscribe(res=>{
+          this.masterService.getAllMasters().subscribe(res=>{
             this.editTodos.splice(this.editTodos.indexOf(master), 1);
             this.formEdit.reset();
             this.allBlogs = res['masters'];
@@ -246,40 +252,41 @@ export class DashboardComponent implements OnInit {
   }
 
   onMasterSubmit(){
-    this.processing = true;
-    // this.disableForm();
-    const selectedOrderIds = this.form.value.skills
-      .map((v, i) => v ? this.category[i] : null)
-      .filter(v => v !== null);
-    const master = {
-      name: this.form.get('name').value,
-      about: this.form.get('about').value,
-      createdBy: this.username,
-      skills: selectedOrderIds
-    }
-    // console.log(master);
-    this.masterService.newMaster(master).subscribe(res=>{
-      if(!res['success']){
-        this.classMes = 'alert-danger';
-        this.message = res['message'];
-        this.processing = false;
-        // this.enableForm();
-      }else{
-        this.classMes = 'alert-success';
-        this.message = res['message'];
-        this.masterService.getAllMasters(this.username)
-          .subscribe(res=>{
-            this.allBlogs = res['masters'];
-          });
-        setTimeout(()=>{
-          this.newPost = false;
-          this.processing = false;
-          this.message = null;
-          this.form.reset();
-          // this.enableForm();
-        },2000)
-      }
-    })
+    console.log(this.selectedFile);
+    // this.processing = true;
+    // // this.disableForm();
+    // const selectedOrderIds = this.form.value.skills
+    //   .map((v, i) => v ? this.category[i] : null)
+    //   .filter(v => v !== null);
+    // const master = {
+    //   name: this.form.get('name').value,
+    //   about: this.form.get('about').value,
+    //   createdBy: this.username,
+    //   skills: selectedOrderIds
+    // }
+    // // console.log(master);
+    // this.masterService.newMaster(master).subscribe(res=>{
+    //   if(!res['success']){
+    //     this.classMes = 'alert-danger';
+    //     this.message = res['message'];
+    //     this.processing = false;
+    //     // this.enableForm();
+    //   }else{
+    //     this.classMes = 'alert-success';
+    //     this.message = res['message'];
+    //     this.masterService.getAllMasters()
+    //       .subscribe(res=>{
+    //         this.allBlogs = res['masters'];
+    //       });
+    //     setTimeout(()=>{
+    //       this.newPost = false;
+    //       this.processing = false;
+    //       this.message = null;
+    //       this.form.reset();
+    //       // this.enableForm();
+    //     },2000)
+    //   }
+    // })
   }
 
   goBack(){
@@ -305,7 +312,7 @@ export class DashboardComponent implements OnInit {
         // console.log(res);
         this.classMes = 'alert-success';
         this.message = res['message'];
-        this.masterService.getAllMasters(this.username).subscribe(res=>{
+        this.masterService.getAllMasters().subscribe(res=>{
           this.allBlogs = res['masters'];
         });
         setTimeout(()=>{

@@ -75,6 +75,7 @@ export class LoginComponent implements OnInit {
     }
     this.auth.login(user).subscribe(res=>{
       if(!res['success']){
+        console.log(res);
         this.message = res['message'];
         this.classMes = 'alert-danger';
         this.processing = false;

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {Observable} from "rxjs/Rx";
+import {Observable, BehaviorSubject} from "rxjs/Rx";
+import {Router} from '@angular/router';
 import * as moment from "moment";
 
 @Injectable({
@@ -11,13 +12,13 @@ export class AuthService {
   // domain = 'https://stormy-crag-43772.herokuapp.com';
   domain = 'http://localhost:8080';
   authToken;
-  user;
+  public user = new BehaviorSubject(null);
   options;
   headers;
 
   constructor(
-    private http:HttpClient
-    // public jwtHelper: JwtHelperService
+    private http:HttpClient,
+    private router:Router
   ) {
   }
 
@@ -53,8 +54,9 @@ export class AuthService {
 
   logOut(){
     this.authToken = null;
-    this.user = null;
+    this.user.next(null);
     localStorage.clear();
+    this.router.navigate(['/']);
   }
 
   storeUserData(token,expiresIn,user){
@@ -63,7 +65,7 @@ export class AuthService {
     localStorage.setItem('user',JSON.stringify(user));
     localStorage.setItem("expires_at", JSON.stringify(expiresAt.valueOf()) );
     this.authToken = token;
-    this.user = user;
+    this.user.next(user);
   }
 
   getProfile(){
@@ -80,4 +82,12 @@ export class AuthService {
     const expiresAt = JSON.parse(expiration);
     return moment(expiresAt);
   }    
+
+  getUser(){
+    if(localStorage['user']){
+      this.user.next(JSON.parse(localStorage.getItem('user')));
+    }else{
+      this.user.next(null);
+    }
+  }
 }

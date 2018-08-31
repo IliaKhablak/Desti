@@ -41,7 +41,7 @@ const masterSchema = new Schema({
     name: {type: String, required: true, validate:usernameValidators},
     about: {type: String},
     skills: [{type: String, required: true}],
-    createdBy: {type: String, required: true},
+    _userId: {type: Schema.Types.ObjectId, required: true}
 });
 
 module.exports = mongoose.model('Master', masterSchema);

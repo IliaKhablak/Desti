@@ -24,7 +24,8 @@
             ],
             "styles": [
               "src/styles.css",
-              "../client/node_modules/materialize-css/dist/css/materialize.css"
+              "../client/node_modules/materialize-css/dist/css/materialize.css",
+              "../client/node_modules/font-awesome/css/font-awesome.css"
             ],
             "scripts": [
               "../client/node_modules/jquery/dist/jquery.js",

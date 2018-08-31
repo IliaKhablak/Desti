@@ -24,7 +24,11 @@ import {ChatService} from './services/chat.service';
 import { CheduleComponent } from './chedule/chedule.component';
 // import { JwtHelperService } from '@auth0/angular-jwt';
 import { AngularDateTimePickerModule } from 'angular2-datetimepicker';
-
+import {ScheduleService} from './services/schedule.service';
+import {BusinessGuard} from './services/business.guard';
+import { BookingComponent } from './booking/booking.component';
+import {ClientGuard} from './services/client.guard';
+import { BookingBusinessComponent } from './booking-business/booking-business.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +40,9 @@ import { AngularDateTimePickerModule } from 'angular2-datetimepicker';
     LoginComponent,
     ProfileComponent,
     BlogComponent,
-    CheduleComponent
+    CheduleComponent,
+    BookingComponent,
+    BookingBusinessComponent
   ],
   imports: [
     BrowserModule,
@@ -57,6 +63,9 @@ import { AngularDateTimePickerModule } from 'angular2-datetimepicker';
     MasterService,
     WebsocketService,
     ChatService,
+    ScheduleService,
+    BusinessGuard,
+    ClientGuard
     // JwtHelperService
   ],
   bootstrap: [AppComponent]

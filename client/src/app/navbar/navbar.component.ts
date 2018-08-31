@@ -10,19 +10,27 @@ import {FlashMessagesService} from 'angular2-flash-messages';
 })
 export class NavbarComponent implements OnInit {
 
+  user;
+
   constructor(
     public auth:AuthService,
     private router:Router,
     private flash:FlashMessagesService
-  ) { }
+  ){
+    
+  }
 
-  ngOnInit() {
+  ngOnInit(){
+    if(this.auth.user.value === null){
+      this.auth.getUser();
+      this.auth.user.subscribe(res=>this.user = res)
+    }else{
+      this.auth.user.subscribe(res=>this.user = res)
+    }
   }
 
   logout(){
     this.auth.logOut();
-    this.flash.show('You are logged uot',{cssClass: 'alert-success', timeout: 2000});
-    this.router.navigate(['/']); 
   }
 
 }

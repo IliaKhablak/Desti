@@ -15,9 +15,12 @@ export class ProfileComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.auth.getProfile().subscribe(res=>{
-      this.user = res['user']
-    })
+    if(this.auth.user.value === null){
+      this.auth.getUser();
+      this.auth.user.subscribe(res=>this.user = res)
+    }else{
+      this.auth.user.subscribe(res=>this.user = res)
+    }
   }
 
 }

@@ -29,9 +29,9 @@ export class MasterService {
     return this.http.post(this.domain+'/masters/newMaster', master, {headers:this.headers})
   }
 
-  getAllMasters(username){
+  getAllMasters(){
     this.createAuthHeaders();
-    return this.http.get(this.domain+'/masters/allMasters/'+username, {headers:this.headers});
+    return this.http.get(this.domain+'/masters/allMasters', {headers:this.headers});
   }
 
   deleteMaster(id){

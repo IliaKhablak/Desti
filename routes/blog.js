@@ -2,8 +2,6 @@ const User = require('../models/user');
 const Blog = require('../models/blog');
 const jwt = require('jsonwebtoken');
 const config = require('../config/database');
-const WebSocket = require('ws');
-
 
 module.exports = (router,server)=>{
     router.post('/newBlog', (req,res)=>{

@@ -1,38 +1,25 @@
-<h1>
+<h1 id="bla" >
   chedule works!
 </h1>
 <br>
 <div *ngIf="message" [ngClass]="classMes" [@popupAnim] style="position:fixed;top:100px;left:50%;z-index: 100;">{{message}}</div>
 <br>
-<angular2-date-picker (onDateSelect)="onDateSelect()" [(ngModel)]="date" [settings]="settings"></angular2-date-picker>
-<!-- <div class="row">
-    <div class="col s6">
-      <label for="birthdate">Birthdate {{birthDate}}</label>
-      <input id="birthdate" name="birthdate" [(ngModel)]="birthDate" (click)="bla()"
-             materialize="pickadate"
-             [materializeActions]="birthDateActions"
-             [materializeParams]="[{format: 'dd/mm/yyyy'}]"
-             type="text" />
-    </div>
-    <div class="col s6">
-       <label for="birthtime">Birthtime {{birthTime}}</label>
-       <input id="birthtime" name="birthtime" [(ngModel)]="birthTime"
-              materialize="pickatime" 
-              [materializeActions]="birthTimeActions"
-              [materializeParams]="[{twelvehour: false}]"
-              placeholder="00:00" class="validate" type="text">
-    </div>
-    
-</div> -->
+<angular2-date-picker (onDateSelect)="onDateSelect($event)" [(ngModel)]="date" [settings]="settings"></angular2-date-picker>
 <div class="row">
-    <div class="col s12 m6" *ngFor="let master of masters">
+    <div class="col s12 m6" *ngFor="let master of masters; let idx=index" [@enterAnimation]>
       <div class="card blue-grey darken-1">
         <div class="card-content white-text" style="height: 300px;">
-          <span class="card-title">{{master.name}}</span>
-          <p>{{master.about}}</p>
+          <span class="card-title">{{master.master.name}}</span>
+          <p>{{master.master.about}}</p>
           <ul>
-            <li *ngFor="let skill of master.skills">{{skill}}</li>
+            <li *ngFor="let skill of master.master.skills">{{skill}}</li>
           </ul>
+          <div>
+            <ng-container *ngFor="let hour of helperArray;let i=index">
+              <input #pickTime type="checkbox" class="filled-in" [id]="master.master._id+''+hour" [(ngModel)]="master.types[hour]" (change)="makeABooking(master.master,hour,pickTime,master.ids[hour],idx)"/>
+              <label [for]="master.master._id+''+hour" [id]="master.master._id+''+hour+'bla'">{{hour}}</label>
+            </ng-container>
+          </div>
         </div>
         <div class="card-action">
           <a href="#">This is a link</a>
