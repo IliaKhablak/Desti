@@ -41,7 +41,9 @@ const masterSchema = new Schema({
     name: {type: String, required: true, validate:usernameValidators},
     about: {type: String},
     skills: [{type: String, required: true}],
-    _userId: {type: Schema.Types.ObjectId, required: true}
+    _userId: {type: Schema.Types.ObjectId, required: true},
+    avatar: {type: String},
+    thumbAvatar: {type:String}
 });
 
 module.exports = mongoose.model('Master', masterSchema);

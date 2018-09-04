@@ -23,10 +23,22 @@ export class MasterService {
     this.headers = this.headers.append('authorization', this.auth.authToken);
   }
 
+  createAuthHeaders2(){
+    this.auth.loadToken();
+    this.headers = new HttpHeaders();
+    // this.headers = this.headers.append('Content-Type', 'multipart/form-data');
+    this.headers = this.headers.append('authorization', this.auth.authToken);
+  }
+
   newMaster(master){
     this.createAuthHeaders();
     // console.log(blog);
     return this.http.post(this.domain+'/masters/newMaster', master, {headers:this.headers})
+  }
+
+  uploadImage(image){
+    this.createAuthHeaders2();
+    return this.http.post(this.domain+'/masters/imgUpload',image,{headers:this.headers})
   }
 
   getAllMasters(){

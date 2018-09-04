@@ -3,6 +3,8 @@ import {AuthService} from '../services/auth.service';
 import {MasterService} from '../services/master.service';
 import {FormControl, FormGroup, FormBuilder, Validators, FormArray} from '@angular/forms';
 import {trigger, animate, transition, style} from '@angular/animations';
+import { FileUploader, FileSelectDirective } from 'ng2-file-upload';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -58,15 +60,23 @@ export class DashboardComponent implements OnInit {
   checkCat = true;
   values = '';
   inpValue;
-  selectedFile: File;
+  selectedFile: File = null;
+  public uploader: FileUploader;
+  attachmentList:any = [];
 
   constructor(
     public auth:AuthService,
     private masterService:MasterService,
     private formBuilder:FormBuilder
   ) {
+    this.auth.loadToken();
+    this.uploader = new FileUploader({url: this.auth.domain+'/masters/imgUpload',authToken:this.auth.authToken});
+    this.uploader.onAfterAddingFile = (file) => { file.withCredentials = false; };
+    this.uploader.onCompleteItem = (item:any,response:any,status:any,headers:any)=>{
+      // console.log(response);
+      this.attachmentList.push(JSON.parse(response));
+    }
     this.masterService.getAllCategories().subscribe(res=>{
-      // console.log(res);
       this.category = res['categories'].category;
       this.controls = this.category.map(c=> new FormControl(false));
       this.createNewMasterForm();
@@ -82,7 +92,13 @@ export class DashboardComponent implements OnInit {
   // }
 
   onFileChanged(event) {
-    this.selectedFile = event.target.files[0]
+    this.selectedFile = <File>event.target.files[0]
+  }
+
+  onUpload(){
+    const fb = new FormData();
+    fb.append('image',this.selectedFile,this.selectedFile.name);
+    this.masterService.uploadImage(fb).subscribe(res=>console.log(res));
   }
 
   ngOnInit(){
@@ -92,6 +108,12 @@ export class DashboardComponent implements OnInit {
     }else{
       this.auth.user.subscribe(res=>this.user = res)
     }
+    // this.uploader = new FileUploader({url: this.auth.domain+'/masters/imgUpload', itemAlias: 'photo',authToken:this.auth.authToken});
+    // this.uploader.onAfterAddingFile = (file) => { file.withCredentials = false; };  
+    // this.uploader.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
+    //      console.log('ImageUpload:uploaded:', item, status, response);
+    //      alert('File uploaded successfully');
+    //  };
     this.username = this.user.username;
     this.masterService.getAllMasters().subscribe(res=>{
       if(!res['success']){
@@ -252,41 +274,44 @@ export class DashboardComponent implements OnInit {
   }
 
   onMasterSubmit(){
-    console.log(this.selectedFile);
-    // this.processing = true;
-    // // this.disableForm();
-    // const selectedOrderIds = this.form.value.skills
-    //   .map((v, i) => v ? this.category[i] : null)
-    //   .filter(v => v !== null);
-    // const master = {
-    //   name: this.form.get('name').value,
-    //   about: this.form.get('about').value,
-    //   createdBy: this.username,
-    //   skills: selectedOrderIds
-    // }
-    // // console.log(master);
-    // this.masterService.newMaster(master).subscribe(res=>{
-    //   if(!res['success']){
-    //     this.classMes = 'alert-danger';
-    //     this.message = res['message'];
-    //     this.processing = false;
-    //     // this.enableForm();
-    //   }else{
-    //     this.classMes = 'alert-success';
-    //     this.message = res['message'];
-    //     this.masterService.getAllMasters()
-    //       .subscribe(res=>{
-    //         this.allBlogs = res['masters'];
-    //       });
-    //     setTimeout(()=>{
-    //       this.newPost = false;
-    //       this.processing = false;
-    //       this.message = null;
-    //       this.form.reset();
-    //       // this.enableForm();
-    //     },2000)
-    //   }
-    // })
+    // console.log(this.selectedFile);
+    this.processing = true;
+    // this.disableForm();
+    const selectedOrderIds = this.form.value.skills
+      .map((v, i) => v ? this.category[i] : null)
+      .filter(v => v !== null);
+    const master = {
+      name: this.form.get('name').value,
+      about: this.form.get('about').value,
+      createdBy: this.username,
+      skills: selectedOrderIds
+    }
+    // console.log(master);
+    this.masterService.newMaster(master).subscribe(res=>{
+      if(!res['success']){
+        this.classMes = 'alert-danger';
+        this.message = res['message'];
+        this.processing = false;
+        console.log(res['message']);
+        // this.enableForm();
+      }else{
+        this.classMes = 'alert-success';
+        this.message = res['message'];
+        this.masterService.getAllMasters()
+          .subscribe(res=>{
+            this.allBlogs = res['masters'];
+          });
+        setTimeout(()=>{
+          this.newPost = false;
+          this.processing = false;
+          this.message = null;
+          this.form.reset();
+          this.attachmentList = [];
+          this.uploader.queue = [];
+          // this.enableForm();
+        },2000)
+      }
+    })
   }
 
   goBack(){

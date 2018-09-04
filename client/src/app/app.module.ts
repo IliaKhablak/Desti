@@ -29,6 +29,8 @@ import {BusinessGuard} from './services/business.guard';
 import { BookingComponent } from './booking/booking.component';
 import {ClientGuard} from './services/client.guard';
 import { BookingBusinessComponent } from './booking-business/booking-business.component';
+import { FileUploadModule } from 'ng2-file-upload';
+
 
 @NgModule({
   declarations: [
@@ -53,7 +55,8 @@ import { BookingBusinessComponent } from './booking-business/booking-business.co
     FlashMessagesModule.forRoot(),
     MaterializeModule,
     FormsModule,
-    AngularDateTimePickerModule
+    AngularDateTimePickerModule,
+    FileUploadModule
   ],
   providers: [
     AuthService,

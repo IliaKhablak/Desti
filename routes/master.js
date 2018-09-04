@@ -1,47 +1,144 @@
-const User = require('../models/user');
-const Blog = require('../models/blog');
 const Master = require('../models/master');
-const jwt = require('jsonwebtoken');
 const config = require('../config/database');
 const Category = require('../models/category');
+const multer = require('multer');
+const sharp = require('sharp');
 
+const store = multer.diskStorage({
+    destination:function(req,file,cb){
+        cb(null,'./uploads/');
+    },
+    filename:function(req,file,cb){
+        cb(null,Date.now()+'-'+file.originalname);
+    }
+});
+const upload = multer({storage:store}).single('file');
+var avatarPath = null;
+var thumb_avatarPath = null;
 
-module.exports = (router)=>{
+module.exports = (router,storage)=>{
     router.post('/newMaster', (req,res)=>{
+        // console.log(req.body);
         if(!req.body['name']){
             res.json({success:false,message:'Master name is required.'})
         }else{
             if(!req.body['skills']){
                 res.json({success:false,message:'Master skills is required.'})
             }else{
-                const master = new Master({
-                    name: req.body.name,
-                    about: req.body.about,
-                    skills: req.body.skills,
-                    _userId: req.decoded.userId
-                });
-                // console.log(blog);
-                master.save((err)=>{
-                    if(err){
-                        if(err.errors){
-                            if(err.errors.name){
-                                res.json({success:false,message:err.errors.name.message})
-                            }else{
-                                if(err.errors.skills){
-                                    res.json({success:false,message:err.errors.skills.message})
-                                }else{
-                                    res.json({success:false,message:err.errors._userId.message})
-                                }
-                            }
-                        }else{
-                            res.json({success:false,message:err})
+                let c = false;
+                let params;
+                if(avatarPath){
+                    let a = [];
+                    storage
+                    .bucket('desti')
+                    .upload(thumb_avatarPath, {
+                        gzip: true,
+                        metadata: {
+                        cacheControl: 'public, max-age=31536000',
+                        },
+                    })
+                    .then(() => {
+                        a.push('wow');
+                        console.log('success');
+                    })
+                    .catch(err => {
+                        res.json({success:false,message:err});
+                    });
+                    storage
+                        .bucket('desti')
+                        .upload(avatarPath, {
+                            gzip: true,
+                            metadata: {
+                            cacheControl: 'public, max-age=31536000',
+                            },
+                        })
+                        .then(() => {
+                            a.push('wow');
+                            console.log('success');
+                        })
+                        .catch(err => {
+                            res.json({success:false,message:err});
+                    });
+                    let b = setInterval(()=>{
+                        if(a.length>1){
+                            let filename = avatarPath.split('/')[avatarPath.split('/').length-1];
+                            let thumb_filename = thumb_avatarPath.split('/')[thumb_avatarPath.split('/').length-1];
+                            params = {
+                                name: req.body.name,
+                                about: req.body.about,
+                                skills: req.body.skills,
+                                _userId: req.decoded.userId,
+                                avatar: "https://storage.googleapis.com/desti/"+filename,
+                                thumbAvatar: "https://storage.googleapis.com/desti/"+thumb_filename
+                            };
+                            avatarPath = null;
+                            thumb_avatarPath = null;
+                            c = true;
+                            clearInterval(b);
                         }
-                    }else{
-                        res.json({success:true,message:'Master saved'})
+                    },100)
+                }else{
+                    params = {
+                        name: req.body.name,
+                        about: req.body.about,
+                        skills: req.body.skills,
+                        _userId: req.decoded.userId
+                    };
+                    c = true;
+                }
+                let d = setInterval(()=>{
+                    if(c){
+                        const master = new Master(params);
+                        master.save((err,newMaster)=>{
+                            if(err){
+                                if(err.errors){
+                                    if(err.errors.name){
+                                        res.json({success:false,message:err.errors.name.message})
+                                    }else{
+                                        if(err.errors.skills){
+                                            res.json({success:false,message:err.errors.skills.message})
+                                        }else{
+                                            res.json({success:false,message:err.errors._userId.message})
+                                        }
+                                    }
+                                }else{
+                                    res.json({success:false,message:err})
+                                }
+                            }else{
+                                    res.json({success:true,message:'Master successfully creted'})                     
+                            }
+                        })
+                        clearInterval(d);
                     }
-                })
+                },100)
             }
         }
+    })
+
+    router.post('/imgUpload', (req,res)=>{
+        upload(req,res,function(err){
+            if(err){
+                return res.json({success:false, message:err});
+            }else{
+                const host = req.hostname;
+                // const filePath = req.protocol + "://" + host + '/' + req.file.path;
+                const filePath = req.protocol + "://" + host + ':8080/' + req.file.path;
+                avatarPath = req.file.path;
+                let arr = req.file.path.split('.');
+                arr[arr.length-2] = arr[arr.length-2] + '_thumb';
+                thumb_avatarPath =  arr.join('.');
+                sharp(avatarPath)
+                .resize(300)
+                .toFile(thumb_avatarPath)
+                .then(data => {
+                    // console.log(data);
+                    return res.json({success:true,path:filePath,uploadname:req.file.filename});
+                })
+                .catch(function(e) {
+                    console.log('Error', e.toString());
+                });
+            }
+        })
     })
 
     router.route('/allCategories').get((req,res)=>{
@@ -107,13 +204,41 @@ module.exports = (router)=>{
     })
 
     router.route('/deleteMaster/:id').delete((req,res)=>{
-        Master.remove({
-            _id: req.params.id
-        },(err,master)=>{
+        Master.findById(req.params.id, (err,master)=>{
             if(err){
                 res.json({success:false,message:err})
             }else{
-                res.json({success:true,message:'Master successfully deleted'})
+                if(master.avatar){
+                    let url = master.avatar.split('/')[master.avatar.split('/').length-1];
+                    let thumb_url = master.thumbAvatar.split('/')[master.thumbAvatar.split('/').length-1];
+                    storage
+                        .bucket('desti')
+                        .file(url)
+                        .delete()
+                        .then(() => {
+                            console.log('success');
+                        })
+                        .catch(err => {
+                            console.error('ERROR:', err);
+                    });
+                    storage
+                        .bucket('desti')
+                        .file(thumb_url)
+                        .delete()
+                        .then(() => {
+                            console.log('success');
+                        })
+                        .catch(err => {
+                            console.error('ERROR:', err);
+                    });
+                }
+                master.remove((err)=>{
+                    if(err){
+                        res.json({success:false,message:err})
+                    }else{
+                        res.json({success:true,message:'Master successfully deleted!'})
+                    }
+                })
             }
         })
     })

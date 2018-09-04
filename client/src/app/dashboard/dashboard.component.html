@@ -6,8 +6,31 @@
 <!-- <a [class.disabled]="loadingBlog" class="waves-effect waves-light btn" *ngIf="!newPost" (click)="reloadBlog()">Reload<i class="material-icons left">refresh</i></a> -->
 <br>
 <br>
-<div class="row">
-  <form class="col s12" [formGroup]="form" (submit)="onMasterSubmit()" *ngIf="newPost">
+<div class="row" *ngIf="newPost">
+    <div class="file-field input-field">
+        <div class="btn">
+          <span>File</span>
+          <input type="file" multiple ng2FileSelect [uploader]="uploader"/>
+        </div>
+        <div class="file-path-wrapper">
+          <input class="file-path validate" type="text">
+        </div>
+    </div>
+    <div *ngFor="let item of uploader.queue">
+      {{item.file.name}}
+      <div class="progress">
+        <div class="determinate" [ngStyle]="{'width':item.progress+'%'}"></div>
+    </div>
+      <button class="btn" (click)="item.upload()">upload</button>
+      <button class="btn" (click)="item.remove()">cancel</button>
+    </div>
+    <br>
+    <h4>Uploaded:</h4>
+    <div *ngFor="let item of attachmentList">
+      <img [src]="item.path" style="height:50px;">
+    </div>
+    <br>
+  <form class="col s12" [formGroup]="form" (submit)="onMasterSubmit()" >
       <div class="row">
           <div class="input-field col s12">
             <input id="name" type="text" name="name" formControlName="name" autocomplete="off" [ngClass]="{'alert':(form.controls.name.errors && form.controls.name.dirty)}">
@@ -44,12 +67,11 @@
         <!-- <a style="display:block;position: relative;z-index:2;" (click)="newCatTrig()"><i class="material-icons left">add</i></a> -->
         <div style="top:30px;" [class.alert-danger]="form.controls.skills.errors" class="alert-transparent"><b *ngIf="form.controls.skills.errors" [@enterAnimation2]>At least one skill has to be selected</b></div>
       </div>
-      <input 
-        style="display: none" 
-        type="file" (change)="onFileChanged($event)" 
-        #fileInput>
-      <button (click)="fileInput.click()">Select File</button>
-      <br>
+      
+      <!-- <button type="button" (click)="onUpload()">Upload</button> -->
+
+      
+      
       <!-- <div class="row">
         <div class="input-field col s12">
           <textarea id="body" class="materialize-textarea" name="body" formControlName="body" rows="8" cols="80" [ngClass]="{'alert':(form.controls.body.errors && form.controls.body.dirty)}"></textarea>
@@ -72,8 +94,12 @@
     <div class="col s12 m4 l4" *ngFor="let blog of allBlogs; let idx=index">
         <ng-container *ngIf="!editTodos.includes(blog); else editTD">
       <div class="card blue-grey darken-1" *ngIf="!updateMaster">
+          <div class="card-image">
+              <img *ngIf="blog.avatar" [src]="blog.thumbAvatar" >
+              <span class="card-title">{{blog.name}}</span>
+            </div>
         <div class="card-content white-text">
-          <span class="card-title">{{blog.name}}</span>
+         
           <p>{{blog.about}}</p>
           <ul>
             <li *ngFor="let skill of blog.skills">{{skill}}</li>
@@ -152,3 +178,6 @@
   <!-- </ng-container> -->
   <!-- </ng-container> -->
   <!-- </ng-container>        -->
+  <!-- <img src="https://storage.googleapis.com/desti/1535781411223-19012-2.jpg"> -->
+
+  
